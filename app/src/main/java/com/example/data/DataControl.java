@@ -34,18 +34,18 @@ public class DataControl {
         values.put(DataContract.Entry.COLUMN_IS_REG, reg.equals("True") ? 1 : 0);
         values.put(DataContract.Entry.COLUMN_SERVER, server);
 
-        if(!existTup(email, server).exist) {
-            write.insert(DataContract.Entry.TABLE_NAME, null, values);
-            return true;
+        if(!existTup(id).exist) {
+            if(write.insert(DataContract.Entry.TABLE_NAME, null, values) == -1)
+                return false;
+            else return true;
         }
         else return false;
     }
 
-    private Proxy existTup(String mail, String ser) {
-        String query = String.format("SELECT * FROM %s WHERE %s = %s and %s = %s",
-                DataContract.Entry.TABLE_NAME, DataContract.Entry.COLUMN_EMAIL, "?",
-                DataContract.Entry.COLUMN_SERVER, "?");
-        cursor = read.rawQuery(query,new String[]{mail, ser});
+    private Proxy existTup(String ID) {
+        String query = String.format("SELECT * FROM %s WHERE %s = %s",
+                DataContract.Entry.TABLE_NAME, DataContract.Entry.COLUMN_DEVICE, "?");
+        cursor = read.rawQuery(query,new String[]{ID});
         if(cursor.getCount() <= 0) {
 //            cursor.close();
             return new Proxy(cursor,false);

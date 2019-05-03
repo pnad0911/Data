@@ -7,12 +7,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class MySQLite extends SQLiteOpenHelper {
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + DataContract.Entry.TABLE_NAME + " (" +
-                    DataContract.Entry.COLUMN_DEVICE + " INT," +
+                    DataContract.Entry.COLUMN_DEVICE + " TEXT," +
                     DataContract.Entry.COLUMN_EMAIL + " TEXT," +
                     DataContract.Entry.COLUMN_IS_REG + " BIT," +
                     DataContract.Entry.COLUMN_SERVER + " TEXT," +
-                    "PRIMARY KEY (" + DataContract.Entry.COLUMN_EMAIL + "," +
-                    DataContract.Entry.COLUMN_SERVER +"))";
+                    "PRIMARY KEY (" + DataContract.Entry.COLUMN_DEVICE +"))";
 
     private static final String SQL_DELETE_ENTRIES =
             "DROP TABLE IF EXISTS " + DataContract.Entry.TABLE_NAME;
