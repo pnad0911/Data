@@ -12,4 +12,14 @@ public final class DataContract {
         public static final String COLUMN_IS_REG = "Is_Registered";
         public static final String COLUMN_SERVER = "Server_Address";
     }
+
+    public static class DataObject {
+        public String id,email,server;
+        public boolean reg;
+        public DataObject(String id, String email, boolean reg, String server) {
+            this.id = id; this.email = email; this.reg = reg; this.server = server;
+        }
+    }
 }
+
+

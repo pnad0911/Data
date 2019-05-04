@@ -4,6 +4,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DataControl {
     private SQLiteDatabase write, read;
@@ -42,6 +46,40 @@ public class DataControl {
         else return false;
     }
 
+    public List<DataContract.DataObject> existES(String email, String server) {
+        String query = String.format("SELECT * FROM %s WHERE %s = %s and %s = %s",
+                DataContract.Entry.TABLE_NAME, DataContract.Entry.COLUMN_EMAIL, "?",
+                DataContract.Entry.COLUMN_SERVER, "?");
+        cursor = read.rawQuery(query,new String[]{email, server});
+        List<DataContract.DataObject> res = new ArrayList<>();
+        while(cursor.moveToNext()) {
+            String fid = cursor.getString(
+                    cursor.getColumnIndexOrThrow(DataContract.Entry.COLUMN_DEVICE));
+            String femail = cursor.getString(
+                    cursor.getColumnIndexOrThrow(DataContract.Entry.COLUMN_EMAIL));
+            boolean freg = cursor.getLong(cursor.getColumnIndexOrThrow(
+                    DataContract.Entry.COLUMN_IS_REG)) == 1 ? true : false;
+            String fserver = cursor.getString(
+                    cursor.getColumnIndexOrThrow(DataContract.Entry.COLUMN_SERVER));
+            res.add(new DataContract.DataObject(fid,femail,freg,fserver));
+        }
+        return res;
+    }
+
+    public void update(String newID, DataContract.DataObject old) {
+        ContentValues values = new ContentValues();
+        values.put(DataContract.Entry.COLUMN_DEVICE, newID);
+        String selection = DataContract.Entry.COLUMN_DEVICE + " = ? and " +
+                DataContract.Entry.COLUMN_EMAIL + " = ? and " +
+                DataContract.Entry.COLUMN_SERVER + " = ?";
+        String[] selectionArgs = { old.id,old.email,old.server };
+        int count = write.update(
+                DataContract.Entry.TABLE_NAME,
+                values,
+                selection,
+                selectionArgs);
+    }
+
     private Proxy existTup(String ID) {
         String query = String.format("SELECT * FROM %s WHERE %s = %s",
                 DataContract.Entry.TABLE_NAME, DataContract.Entry.COLUMN_DEVICE, "?");
@@ -73,7 +111,7 @@ public class DataControl {
                     cursor.getColumnIndexOrThrow(DataContract.Entry.COLUMN_IS_REG));
             String server = cursor.getString(
                     cursor.getColumnIndexOrThrow(DataContract.Entry.COLUMN_SERVER));
-            System.out.println("Device ID: " + id + "; Email Address: " + email +
+            Log.println(Log.DEBUG, "Database", "Device ID: " + id + "; Email Address: " + email +
                     "; Is Registered: " + ((int)reg == 1 ? "True" : "False") +
                     "; Server Address: " + server);
         }

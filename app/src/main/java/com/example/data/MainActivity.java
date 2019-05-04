@@ -1,6 +1,5 @@
 package com.example.data;
 
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,20 +8,18 @@ import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.annotation.NonNull;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.SearchView;
 
 public class MainActivity extends AppCompatActivity {
 
     Button button;
     EditText id ,email,reg,server;
-    DataControl DC;
+    static DataControl DC;
     AlertDialog InsertDialog;
+
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
@@ -36,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 case R.id.navigation_dashboard:
                     Intent intentSearch = new Intent(MainActivity.this ,
-                            Main2Activity.class);
+                            SearchActivity.class);
                     MainActivity.this.startActivity(intentSearch);
                     return true;
             }
@@ -52,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         button = (Button) findViewById(R.id.Enter);
-        id = (EditText) findViewById(R.id.ID);
+        id = (EditText) findViewById(R.id.strID);
         email = (EditText) findViewById(R.id.Email);
         reg = (EditText) findViewById(R.id.Reg);
         server = (EditText) findViewById(R.id.Server);
@@ -65,21 +62,6 @@ public class MainActivity extends AppCompatActivity {
                 DC.print();
             }
         });
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.options_menu, menu);
-
-        SearchManager searchManager =
-                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView =
-                (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
-
-        return true;
     }
 
     @Override
@@ -105,5 +87,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
         InsertDialog.show();
+    }
+
+    private static Context mContext;
+
+    public static Context getContext() {
+        return mContext;
     }
 }
