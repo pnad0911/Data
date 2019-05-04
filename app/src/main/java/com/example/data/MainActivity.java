@@ -57,8 +57,13 @@ public class MainActivity extends AppCompatActivity {
         DC = new DataControl(this);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                show(DC.addTuple(id.getText().toString(), email.getText().toString(),
-                        reg.getText().toString(), server.getText().toString()));
+                DataContract.DataObject tmp = new DataContract.DataObject(
+                        id.getText().toString(),
+                        email.getText().toString(),
+                        reg.getText().toString().length() == 0 ? null :
+                                (reg.getText().toString().toLowerCase().equals("true") ? true : false),
+                        server.getText().toString());
+                show(DC.addTuple(tmp));
                 DC.print();
             }
         });
@@ -70,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private void show(boolean success) {
+    private void show(Boolean success) {
         try {
             InsertDialog.dismiss();
         } catch (Exception e) {
@@ -78,8 +83,14 @@ public class MainActivity extends AppCompatActivity {
         }
         InsertDialog = new AlertDialog.Builder(MainActivity.this).create();
         InsertDialog.setTitle("REGISTRATION");
-        InsertDialog.setMessage(success ? "Registration Successful" :
-                (id.getText().toString() + " is already registered"));
+        String mes;
+        if(success == null)
+            mes = "Invalid Entries";
+        else if(success == false)
+            mes = id.getText().toString() + " is already registered";
+        else
+            mes = "Registration Successful";
+        InsertDialog.setMessage(mes);
         InsertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {

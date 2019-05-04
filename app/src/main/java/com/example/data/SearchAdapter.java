@@ -47,10 +47,10 @@ public class SearchAdapter extends BaseAdapter implements Filterable{
     public View getView(int position, View convertView, ViewGroup parent) {
         View rowView = mInflater.inflate(R.layout.search_list_item, parent, false);
         final DataContract.DataObject found = (DataContract.DataObject) getItem(position);
-        ((TextView) rowView.findViewById((R.id.strID))).setText(found.id);
-        ((TextView) rowView.findViewById((R.id.strEmail))).setText(found.email);
-        ((TextView) rowView.findViewById((R.id.strReg))).setText(Boolean.toString(found.reg));
-        ((TextView) rowView.findViewById((R.id.strServer))).setText(found.server);
+        ((TextView) rowView.findViewById((R.id.strID))).setText("Device ID: " + found.id);
+        ((TextView) rowView.findViewById((R.id.strEmail))).setText("Email: "+ found.email);
+        ((TextView) rowView.findViewById((R.id.strReg))).setText("Registered: " + Boolean.toString(found.reg));
+        ((TextView) rowView.findViewById((R.id.strServer))).setText("Server: " + found.server);
         return rowView;
     }
 

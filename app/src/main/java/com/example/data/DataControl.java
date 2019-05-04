@@ -30,15 +30,23 @@ public class DataControl {
         read = mySQLite.getReadableDatabase();
     }
 
+    private boolean checkValidInput(DataContract.DataObject dataObject) {
+        if(dataObject.id.length() == 0 || dataObject.email.length() == 0 ||
+                dataObject.reg == null || dataObject.server.length() == 0)
+            return false;
+        return true;
+    }
 
-    public boolean addTuple(String id, String email, String reg, String server) {
+
+    public Boolean addTuple(DataContract.DataObject dataObject) {
+        if(!checkValidInput(dataObject)) return null;
         ContentValues values = new ContentValues();
-        values.put(DataContract.Entry.COLUMN_DEVICE,id);
-        values.put(DataContract.Entry.COLUMN_EMAIL, email);
-        values.put(DataContract.Entry.COLUMN_IS_REG, reg.equals("True") ? 1 : 0);
-        values.put(DataContract.Entry.COLUMN_SERVER, server);
+        values.put(DataContract.Entry.COLUMN_DEVICE,dataObject.id);
+        values.put(DataContract.Entry.COLUMN_EMAIL, dataObject.email);
+        values.put(DataContract.Entry.COLUMN_IS_REG, dataObject.reg ? 1 : 0);
+        values.put(DataContract.Entry.COLUMN_SERVER, dataObject.server);
 
-        if(!existTup(id).exist) {
+        if(!existTup(dataObject.id).exist) {
             if(write.insert(DataContract.Entry.TABLE_NAME, null, values) == -1)
                 return false;
             else return true;
@@ -66,18 +74,23 @@ public class DataControl {
         return res;
     }
 
-    public void update(String newID, DataContract.DataObject old) {
+    public boolean update(String newID, DataContract.DataObject old) {
         ContentValues values = new ContentValues();
         values.put(DataContract.Entry.COLUMN_DEVICE, newID);
         String selection = DataContract.Entry.COLUMN_DEVICE + " = ? and " +
                 DataContract.Entry.COLUMN_EMAIL + " = ? and " +
                 DataContract.Entry.COLUMN_SERVER + " = ?";
         String[] selectionArgs = { old.id,old.email,old.server };
-        int count = write.update(
-                DataContract.Entry.TABLE_NAME,
-                values,
-                selection,
-                selectionArgs);
+        try {
+            write.update(
+                    DataContract.Entry.TABLE_NAME,
+                    values,
+                    selection,
+                    selectionArgs);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     private Proxy existTup(String ID) {

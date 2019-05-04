@@ -24,7 +24,7 @@ import java.util.ArrayList;
 public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     SearchAdapter searchAdapter;
-    AlertDialog InsertDialog;
+    AlertDialog InsertDialog, subDialog;
     private int sIdx;
 
     Activity Main;
@@ -71,6 +71,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     private void show(int position) {
         try {
             InsertDialog.dismiss();
+            subDialog.dismiss();
         } catch (Exception e) {
 
         }
@@ -84,14 +85,36 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         InsertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Change",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        searchAdapter.DC.update(edittext.getText().toString(),
-                                searchAdapter.getSearchItem(sIdx));
+                        String ingEmail = searchAdapter.getSearchItem(sIdx).email;
+                        String ingSer = searchAdapter.getSearchItem(sIdx).server;
+                        showSuccess(searchAdapter.DC.update(edittext.getText().toString(),
+                                searchAdapter.getSearchItem(sIdx)));
+
+                        searchAdapter.getFilter().filter(ingEmail + " " + ingSer);
                         dialog.dismiss();
                     }
                 });
         InsertDialog.show();
     }
 
+    private void showSuccess(boolean bool) {
+        try {
+            InsertDialog.dismiss();
+            subDialog.dismiss();
+        } catch (Exception e) {
+
+        }
+        subDialog = new AlertDialog.Builder(SearchActivity.this).create();
+        subDialog.setTitle("UPDATE");
+        subDialog.setMessage(bool ? "Successful update" : "This ID is already taken");
+        subDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+        subDialog.show();
+    }
     @Override
     public boolean onQueryTextSubmit(String query) {
         return false;
