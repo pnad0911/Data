@@ -10,9 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataControl {
+
     private SQLiteDatabase write, read;
     private MySQLite mySQLite;
     private Cursor cursor;
+
+
+    public static String strNull = "";
 
     class Proxy {
         public Cursor c;
@@ -54,11 +58,32 @@ public class DataControl {
         else return false;
     }
 
+    private class pair {
+        String query;
+        String[] c;
+        pair(String query, String[] c) {
+            this.query = query;
+            this.c = c;
+        }
+    }
+
+    private pair queryES(String email, String server) {
+        if((email.length() > 0 && server.length() > 0) ||
+                (email.length() == 0 && server.length() == 0))
+            return new pair(String.format("SELECT * FROM %s WHERE %s LIKE %s and %s LIKE %s",
+                    DataContract.Entry.TABLE_NAME, DataContract.Entry.COLUMN_EMAIL, "?",
+                    DataContract.Entry.COLUMN_SERVER, "?"),new String[]{email,server});
+        else if(email.length() > 0 && server.length() == 0)
+            return new pair(String.format("SELECT * FROM %s WHERE %s LIKE %s",
+                    DataContract.Entry.TABLE_NAME, DataContract.Entry.COLUMN_EMAIL, "?"),new String[]{email});
+        else
+            return new pair(String.format("SELECT * FROM %s WHERE %s LIKE %s",
+                    DataContract.Entry.TABLE_NAME, DataContract.Entry.COLUMN_SERVER, "?"),new String[]{server});
+    }
+
     public List<DataContract.DataObject> existES(String email, String server) {
-        String query = String.format("SELECT * FROM %s WHERE %s = %s and %s = %s",
-                DataContract.Entry.TABLE_NAME, DataContract.Entry.COLUMN_EMAIL, "?",
-                DataContract.Entry.COLUMN_SERVER, "?");
-        cursor = read.rawQuery(query,new String[]{email, server});
+        pair query = queryES(email,server);
+        cursor = read.rawQuery(query.query,query.c);
         List<DataContract.DataObject> res = new ArrayList<>();
         while(cursor.moveToNext()) {
             String fid = cursor.getString(

@@ -14,10 +14,13 @@ import java.util.ArrayList;
 
 public class SearchAdapter extends BaseAdapter implements Filterable{
 
+    private boolean eBoo = false, sBoo = false;
+    private String oldE = new String(), oldS = new String();
     private Activity activity;
     private ArrayList<DataContract.DataObject> filteredList;
     private LayoutInflater mInflater;
     private SearchFilter searchFilter;
+    String query;
     DataControl DC;
 
     public SearchAdapter(Activity activity) {
@@ -30,7 +33,7 @@ public class SearchAdapter extends BaseAdapter implements Filterable{
 
     @Override
     public int getCount() {
-        return filteredList.size();
+        return filteredList == null ? 0 : filteredList.size();
     }
 
     @Override
@@ -61,13 +64,15 @@ public class SearchAdapter extends BaseAdapter implements Filterable{
     }
 
     private class SearchFilter extends Filter {
+
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults filterResults = new FilterResults();
-            String[] token = String.valueOf(constraint).split(" ");
-            if (constraint != null && constraint.length()>0 && token.length == 2) {
+            String strC = constraint.toString();
+            if (!(oldE.length() == 0 && oldS.length() == 0 && strC.length() == 0) ) {
                 ArrayList<DataContract.DataObject> tmp = new ArrayList<DataContract.DataObject>();
-                for (DataContract.DataObject o : DC.existES(token[0],token[1])) {
+                for (DataContract.DataObject o : DC.existES(eBoo ? strC : oldE,
+                        sBoo ? strC: oldS)) {
                     tmp.add(o);
                 }
                 filterResults.count = tmp.size();
@@ -76,15 +81,32 @@ public class SearchAdapter extends BaseAdapter implements Filterable{
                 filterResults.count = 0;
                 filterResults.values = new ArrayList<>();
             }
+            update(constraint.toString());
+            eBoo = false; sBoo = false;
             return filterResults;
         }
 
-        @SuppressWarnings("unchecked")
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             filteredList = (ArrayList<DataContract.DataObject>) results.values;
             notifyDataSetChanged();
         }
+    }
+
+    protected SearchAdapter setEmail() {
+        eBoo = true;
+        return this;
+    }
+
+    protected SearchAdapter setServer() {
+        sBoo = true;
+        return this;
+    }
+
+    protected Filter update( String str) {
+        oldE = eBoo ? str : oldE;
+        oldS = sBoo ? str : oldS;
+        return searchFilter;
     }
 
     public DataContract.DataObject getSearchItem(int i) {
